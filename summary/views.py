@@ -13,27 +13,12 @@ from sites.models import Values
 def index(request):
 
     site_list = Sites.objects.order_by('id')
+      
+    sum_value = Values.objects.values('site_id').filter(site__in = site_list).annotate(sum_a = Sum('valueA')).annotate(sum_b = Sum('valueB'))
     
-    cursor = connection.cursor()
-    #cursor.execute("SELECT * FROM Values WHERE site = %s", 'XYZ Site')
-    cursor.fetchone()
-      
-      
-      
-    sum_value_a =  Values.objects.filter(site = site_list[0]).aggregate(Sum('valueA')).values()
-    sum_value_a2 = Values.objects.filter(site = site_list[1]).aggregate(Sum('valueA')).values()
-    sum_value_a3 = Values.objects.filter(site = site_list[2]).aggregate(Sum('valueA')).values()
-    sum_value_b =  Values.objects.filter(site = site_list[0]).aggregate(Sum('valueB')).values()
-    sum_value_b2 = Values.objects.filter(site = site_list[1]).aggregate(Sum('valueB')).values()
-    sum_value_b3 = Values.objects.filter(site = site_list[2]).aggregate(Sum('valueB')).values()
+    list_values = zip(site_list, sum_value)
         
-    a_list = [sum_value_a , sum_value_a2, sum_value_a3]
-    b_list = [sum_value_b , sum_value_b2, sum_value_b3]
-    
-    table = zip(site_list, a_list, b_list)
-    str(table)
-        
-    context =  ({'table': table})
+    context =  ({'site_list': site_list, 'list_values':list_values})
     return render(request, 'summary/index.html', context)   
     
 
@@ -55,4 +40,4 @@ def average(context):
             
     context = RequestContext(context, {'table': table})
     template = loader.get_template('summary/average.html')
-    return HttpResponse(template.render(context))    
+    return HttpResponse(template.render(context))   
