@@ -44,12 +44,12 @@
                 </tr>
             </thead>
                          
-            {% if table %}     
-               {% for site,a,b in table %}
+            {% if list_values  %}     
+               {% for name,site in list_values %}
                    <tr class="{% cycle 'row1' 'row2' 'row3' %}">                                 
-                    <td class="row1">{{ site.site_name }}</td>                  
-                    <td class="row2"> {{ a }} </td>
-                    <td class="row3">{{ b }} </td>                  
+                    <td class="row1">{{ name.site_name }}</td>                  
+                    <td class="row2"> {{ site.sum_a|floatformat:"2" }} </td>
+                    <td class="row3">{{ site.sum_b|floatformat:"2" }} </td>                  
                 </tr>
  
                 {% endfor %}
