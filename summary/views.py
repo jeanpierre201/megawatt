@@ -22,22 +22,14 @@ def index(request):
     return render(request, 'summary/index.html', context)   
     
 
-def average(context):
+def average(request):
 	
     site_list = Sites.objects.order_by('id')
           
-    avg_value_a =  Values.objects.filter(site = site_list[0]).aggregate(Avg('valueA')).values()
-    avg_value_a2 = Values.objects.filter(site = site_list[1]).aggregate(Avg('valueA')).values()
-    avg_value_a3 = Values.objects.filter(site = site_list[2]).aggregate(Avg('valueA')).values() 
-    avg_value_b =  Values.objects.filter(site = site_list[0]).aggregate(Avg('valueB')).values()
-    avg_value_b2 = Values.objects.filter(site = site_list[1]).aggregate(Avg('valueB')).values()
-    avg_value_b3 = Values.objects.filter(site = site_list[2]).aggregate(Avg('valueB')).values()
+    avg_value = Values.objects.values('site_id').filter(site__in = site_list).annotate(sum_a = Avg('valueA')).annotate(sum_b = Avg('valueB'))
         
-    a_list = (avg_value_a , avg_value_a2, avg_value_a3)
-    b_list = [avg_value_b , avg_value_b2, avg_value_b3]
-    
-    table = zip(site_list, a_list, b_list)
+    list_values = zip(site_list, avg_value)
             
-    context = RequestContext(context, {'table': table})
-    template = loader.get_template('summary/average.html')
-    return HttpResponse(template.render(context))   
+    context =  ({'site_list': site_list, 'list_values':list_values})
+    return render(request, 'summary/index.html', context)   
+     
